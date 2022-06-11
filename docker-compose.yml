@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  isbpanel-api-sales:
+    container_name: isbpanel-api-sales
+    image: isbpanel-api-sales:0.0.1
+    build: .
+    ports:
+      - 5053:5053
+    restart: always
