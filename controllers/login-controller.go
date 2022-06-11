@@ -89,8 +89,9 @@ func Home(c *fiber.Ctx) error {
 	claims := user.Claims.(jwt.MapClaims)
 	name := claims["name"].(string)
 	temp_decp := helpers.Decryption(name)
-	client_username, _ := helpers.Parsing_Decry(temp_decp, "==")
+	client_username, client_depart := helpers.Parsing_Decry(temp_decp, "==")
 	log.Println(client_username)
+	log.Println(client_depart)
 
 	c.Status(fiber.StatusOK)
 	return c.JSON(fiber.Map{

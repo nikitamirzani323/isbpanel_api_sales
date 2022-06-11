@@ -3,16 +3,12 @@ package entities
 import "encoding/json"
 
 type Model_crm struct {
-	Crm_id        int         `json:"crm_id"`
-	Crm_phone     string      `json:"crm_phone"`
-	Crm_name      string      `json:"crm_name"`
-	Crm_pic       interface{} `json:"crm_pic"`
-	Crm_totalpic  int         `json:"crm_totalpic"`
-	Crm_source    string      `json:"crm_source"`
-	Crm_status    string      `json:"crm_status"`
-	Crm_statuscss string      `json:"crm_statuscss"`
-	Crm_create    string      `json:"crm_create"`
-	Crm_update    string      `json:"crm_update"`
+	Crm_idcrmsales  int    `json:"crm_idcrmsales"`
+	Crm_idusersales int    `json:"crm_idusersales"`
+	Crm_phone       string `json:"crm_phone"`
+	Crm_name        string `json:"crm_name"`
+	Crm_create      string `json:"crm_create"`
+	Crm_update      string `json:"crm_update"`
 }
 type Model_crmsales_simple struct {
 	Crmsales_username     string `json:"crmsales_username"`
@@ -43,8 +39,8 @@ type Model_crmduniafilm struct {
 }
 
 type Controller_crm struct {
-	Crm_search string `json:"crm_search"`
 	Crm_page   int    `json:"crm_page"`
+	Crm_status string `json:"crm_status"`
 }
 type Controller_crmsales struct {
 	Crmsales_phone string `json:"crmsales_phone"`
