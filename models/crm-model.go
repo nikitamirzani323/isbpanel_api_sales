@@ -14,10 +14,10 @@ import (
 	"github.com/nleeper/goment"
 )
 
-func Fetch_crm(username, status string) (helpers.Responsemovie, error) {
+func Fetch_crm(username, status string) (helpers.Response, error) {
 	var obj entities.Model_crm
 	var arraobj []entities.Model_crm
-	var res helpers.Responsemovie
+	var res helpers.Response
 	msg := "Data Not Found"
 	con := db.CreateCon()
 	ctx := context.Background()
@@ -69,8 +69,6 @@ func Fetch_crm(username, status string) (helpers.Responsemovie, error) {
 	res.Status = fiber.StatusOK
 	res.Message = msg
 	res.Record = arraobj
-	res.Perpage = perpage
-	res.Totalrecord = totalrecord
 	res.Time = time.Since(start).String()
 
 	return res, nil
