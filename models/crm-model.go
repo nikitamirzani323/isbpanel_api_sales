@@ -25,12 +25,13 @@ func Fetch_crm(username, status string) (helpers.Response, error) {
 
 	sql_select := `SELECT 
 		A.idcrmsales, A.phone, B.nama, B.idusersales,
-		createcrmsales, to_char(COALESCE(createdatecrmsales,NOW()), 'YYYY-MM-DD HH24:MI:SS'),
+		A.createcrmsales, to_char(COALESCE(A.createdatecrmsales,NOW()), 'YYYY-MM-DD HH24:MI:SS'),
+		A.updatecrmsales, to_char(COALESCE(A.updatedatecrmsales,NOW()) , 'YYYY-MM-DD HH24:MI:SS')
 		FROM ` + configs.DB_tbl_trx_crmsales + `  as A 
 		JOIN ` + configs.DB_tbl_trx_usersales + `  as B ON B.phone = A.phone
-		WHERE username=$1 
-		AND statususersales=$2 
-		ORDER BY createcrmsales DESC  
+		WHERE A.username=$1 
+		AND B.statususersales=$2 
+		ORDER BY A.createdatecrmsales ASC    
 	`
 
 	row, err := con.QueryContext(ctx, sql_select, username, status)
