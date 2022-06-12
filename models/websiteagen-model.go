@@ -21,7 +21,7 @@ func Fetch_websiteagenHome() (helpers.Response, error) {
 	start := time.Now()
 
 	sql_select := `SELECT 
-			idwebagen , nmwebagen, 
+			idwebagen , nmwebagen  
 			FROM ` + configs.DB_tbl_mst_websiteagen + `  
 			ORDER BY nmwebagen ASC    
 	`
