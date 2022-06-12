@@ -55,7 +55,7 @@ func Crmhome(c *fiber.Ctx) error {
 	var obj entities.Model_crm
 	var arraobj []entities.Model_crm
 	render_page := time.Now()
-	resultredis, flag := helpers.GetRedis(Fieldcrm_home_redis + "_" + client_admin + "_" + client.Crm_status + "_" + strconv.Itoa(client.Crm_page))
+	resultredis, flag := helpers.GetRedis(Fieldcrm_home_redis + "_" + client_admin + "_" + client.Crm_status)
 	jsonredis := []byte(resultredis)
 	perpage_RD, _ := jsonparser.GetInt(jsonredis, "perpage")
 	totalrecord_RD, _ := jsonparser.GetInt(jsonredis, "totalrecord")
@@ -78,7 +78,7 @@ func Crmhome(c *fiber.Ctx) error {
 	})
 
 	if !flag {
-		result, err := models.Fetch_crm(client_admin, client.Crm_status, client.Crm_page)
+		result, err := models.Fetch_crm(client_admin, client.Crm_status)
 		if err != nil {
 			c.Status(fiber.StatusBadRequest)
 			return c.JSON(fiber.Map{
@@ -87,7 +87,7 @@ func Crmhome(c *fiber.Ctx) error {
 				"record":  nil,
 			})
 		}
-		helpers.SetRedis(Fieldcrm_home_redis+"_"+client_admin+"_"+client.Crm_status+"_"+strconv.Itoa(client.Crm_page), result, 60*time.Minute)
+		helpers.SetRedis(Fieldcrm_home_redis+"_"+client_admin+"_"+client.Crm_status, result, 60*time.Minute)
 		log.Println("CRM SALES MYSQL")
 		return c.JSON(result)
 	} else {
