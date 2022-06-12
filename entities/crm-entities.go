@@ -51,15 +51,14 @@ type Controller_crmisbtv struct {
 type Controller_crmsave struct {
 	Page            string `json:"page" validate:"required"`
 	Sdata           string `json:"sdata" validate:"required"`
-	Crm_page        int    `json:"crm_page"`
-	Crm_idusersales int    `json:"crm_idusersales"`
-	Crm_idcrmsales  int    `json:"crm_idcrmsales"`
+	Crm_idusersales int    `json:"crm_idusersales" validate:"required"`
+	Crm_idcrmsales  int    `json:"crm_idcrmsales" validate:"required"`
 	Crm_idwebagen   int    `json:"crm_idcwebagen"`
 	Crm_status      string `json:"crm_status" validate:"required"`
-	Crm_status_dua  string `json:"crm_status_dua" validate:"required"`
+	Crm_status_dua  string `json:"crm_status_dua" `
 	Crm_note        string `json:"crm_note" `
 	Crm_phone       string `json:"crm_phone" `
-	Crm_username    string `json:"crm_username" `
+	Crm_deposit     int    `json:"crm_deposit"`
 }
 type Controller_crmstatussave struct {
 	Page       string `json:"page" validate:"required"`

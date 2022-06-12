@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"log"
-	"strconv"
 	"time"
 
 	"bitbucket.org/isbtotogroup/isbpanel_api_sales/entities"
@@ -136,11 +135,11 @@ func CrmSave(c *fiber.Ctx) error {
 	temp_decp := helpers.Decryption(name)
 	client_admin, _ := helpers.Parsing_Decry(temp_decp, "==")
 
-	//admin, status, status_dua, phone, username, sData string, idusersales, idcrmsales, idwebagen int
+	//admin, status, status_dua, phone, note, sData string, idusersales, idcrmsales, idwebagen, deposit int
 	result, err := models.Save_crm(
 		client_admin,
-		client.Crm_status, client.Crm_status_dua, client.Crm_phone, client.Crm_username, client.Crm_note,
-		client.Sdata, client.Crm_idusersales, client.Crm_idcrmsales, client.Crm_idwebagen)
+		client.Crm_status, client.Crm_status_dua, client.Crm_phone, client.Crm_note,
+		client.Sdata, client.Crm_idusersales, client.Crm_idcrmsales, client.Crm_idwebagen, client.Crm_deposit)
 	if err != nil {
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{
@@ -150,10 +149,10 @@ func CrmSave(c *fiber.Ctx) error {
 		})
 	}
 
-	_deleteredis_crm(client.Crm_page, "", "")
+	_deleteredis_crm(client_admin, "PROCESS")
 	return c.JSON(result)
 }
-func _deleteredis_crm(page int, admin, status string) {
-	val_master := helpers.DeleteRedis(Fieldcrm_home_redis + "_" + admin + "_" + status + "_" + strconv.Itoa(page))
+func _deleteredis_crm(admin, status string) {
+	val_master := helpers.DeleteRedis(Fieldcrm_home_redis + "_" + admin + "_" + status)
 	log.Printf("Redis Delete BACKEND CRM : %d", val_master)
 }
