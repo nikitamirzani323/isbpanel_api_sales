@@ -24,7 +24,7 @@ require (
 	github.com/klauspost/compress v1.15.5 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/lib/pq v1.1.1 // indirect
-	github.com/nleeper/goment v1.4.2 // indirect
+	github.com/nleeper/goment v1.4.4 // indirect
 	github.com/tkuchiki/go-timezone v0.2.2 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.37.0 // indirect

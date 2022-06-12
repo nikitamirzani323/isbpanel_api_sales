@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"database/sql"
+	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -12,6 +13,7 @@ import (
 	"bitbucket.org/isbtotogroup/isbpanel_api_sales/entities"
 	"bitbucket.org/isbtotogroup/isbpanel_api_sales/helpers"
 	"github.com/gofiber/fiber/v2"
+	"github.com/nleeper/goment"
 )
 
 func Fetch_crm(username, status string, page int) (helpers.Responsemovie, error) {
@@ -95,6 +97,101 @@ func Fetch_crm(username, status string, page int) (helpers.Responsemovie, error)
 	res.Perpage = perpage
 	res.Totalrecord = totalrecord
 	res.Time = time.Since(start).String()
+
+	return res, nil
+}
+func Save_crm(admin, status, status_dua, phone, username, note, sData string, idusersales, idcrmsales, idwebagen int) (helpers.Response, error) {
+	var res helpers.Response
+	msg := "Failed"
+	tglnow, _ := goment.New()
+	render_page := time.Now()
+
+	sql_update_parent := `
+			UPDATE 
+			` + configs.DB_tbl_trx_usersales + `  
+			SET statususersales=$1, 
+			updateusersales=$2, updatedateusersales=$3 
+			WHERE idusersales =$4 
+		`
+
+	flag_update, msg_update := Exec_SQL(sql_update_parent, configs.DB_tbl_trx_usersales, "UPDATE",
+		status, admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"), idusersales)
+
+	if flag_update {
+		log.Println(msg_update)
+
+		sql_update_detail := `
+			UPDATE 
+			` + configs.DB_tbl_trx_crmsales + `  
+			SET statuscrmsales_satu=$1, statuscrmsales_dua=$2, notecrmsales=$3, 
+			updatecrmsales=$4, updatedatecrmsales=$5  
+			WHERE idcrmsales=$6  
+		`
+
+		flag_update_detail, msg_update_detail := Exec_SQL(sql_update_detail, configs.DB_tbl_trx_crmsales, "UPDATE",
+			status, status_dua, note, admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"), idcrmsales)
+
+		if flag_update_detail {
+			log.Println(msg_update_detail)
+
+			sql_insert := `
+				insert into
+				` + configs.DB_tbl_trx_usersales_log + ` (
+					idusersaleslog , idusersales, idcrmsales, statuslog, 
+					createusersaleslog, createdateusersaleslog 
+				) values (
+					$1, $2, $3, $4, 
+					$5, $6 
+				)
+			`
+			field_column := configs.DB_tbl_trx_usersales_log + tglnow.Format("YYYY")
+			idrecord_counter := Get_counter(field_column)
+			flag_insert, msg_insert := Exec_SQL(sql_insert, configs.DB_tbl_trx_usersales_log, "INSERT",
+				tglnow.Format("YY")+strconv.Itoa(idrecord_counter), idusersales, idcrmsales, status,
+				admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"))
+
+			if flag_insert {
+				msg = "Succes"
+				log.Println(msg_insert)
+
+				if status_dua == "DEPOSIT" { // DEPOSIT
+					sql_insert := `
+						insert into
+						` + configs.DB_tbl_trx_usersales_deposit + ` (
+							idusersalesdeposit , idcrmsales, idwebagen, phone, username, 
+							createusersalesdeposit, createdateusersalesdeposit  
+						) values (
+							$1, $2, $3, $4, $5,
+							$6, $7 
+						)
+					`
+					field_column := configs.DB_tbl_trx_usersales_deposit + tglnow.Format("YYYY")
+					idrecord_counter := Get_counter(field_column)
+					flag_insert, msg_insert := Exec_SQL(sql_insert, configs.DB_tbl_trx_usersales_deposit, "INSERT",
+						tglnow.Format("YY")+strconv.Itoa(idrecord_counter), idcrmsales, idwebagen, phone, username,
+						admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"))
+
+					if flag_insert {
+						msg = "Succes"
+						log.Println(msg_insert)
+					} else {
+						log.Println(msg_insert)
+					}
+				}
+			} else {
+				log.Println(msg_insert)
+			}
+		} else {
+			log.Println(msg_update_detail)
+		}
+	} else {
+		log.Println(msg_update)
+	}
+
+	res.Status = fiber.StatusOK
+	res.Message = msg
+	res.Record = nil
+	res.Time = time.Since(render_page).String()
 
 	return res, nil
 }

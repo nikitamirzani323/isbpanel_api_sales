@@ -54,13 +54,8 @@ func Init() *fiber.App {
 	app.Post("/api/alladminrule", middleware.JWTProtected(), controllers.Adminrulehome)
 	app.Post("/api/saveadminrule", middleware.JWTProtected(), controllers.AdminruleSave)
 
-	app.Post("/api/domain", middleware.JWTProtected(), controllers.Domainhome)
-	app.Post("/api/domainsave", middleware.JWTProtected(), controllers.DomainSave)
-
-	app.Post("/api/game", middleware.JWTProtected(), controllers.Gamehome)
-	app.Post("/api/gamesave", middleware.JWTProtected(), controllers.Gamesave)
-
 	app.Post("/api/crm", middleware.JWTProtected(), controllers.Crmhome)
+	app.Post("/api/crmsave", middleware.JWTProtected(), controllers.CrmSave)
 
 	app.Post("/api/departement", middleware.JWTProtected(), controllers.Departementhome)
 	app.Post("/api/departementsave", middleware.JWTProtected(), controllers.DepartementSave)

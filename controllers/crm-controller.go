@@ -15,9 +15,6 @@ import (
 )
 
 const Fieldcrm_home_redis = "LISTCRM_SALES_ISBPANEL"
-const Fieldcrmsales_home_redis = "LISTCRMSALES_BACKEND_ISBPANEL"
-const Fieldcrmisbtv_home_redis = "LISTCRMISBTV_BACKEND_ISBPANEL"
-const Fieldcrmduniafilm_home_redis = "LISTCRMDUNIAFILM_BACKEND_ISBPANEL"
 
 func Crmhome(c *fiber.Ctx) error {
 	var errors []*helpers.ErrorResponse
@@ -105,11 +102,58 @@ func Crmhome(c *fiber.Ctx) error {
 		})
 	}
 }
+func CrmSave(c *fiber.Ctx) error {
+	var errors []*helpers.ErrorResponse
+	client := new(entities.Controller_crmsave)
+	validate := validator.New()
+	if err := c.BodyParser(client); err != nil {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+			"record":  nil,
+		})
+	}
 
-func _deleteredis_crm(page int, phone, search string) {
-	val_master := helpers.DeleteRedis(Fieldcrm_home_redis + "_" + strconv.Itoa(page) + "_" + search)
+	err := validate.Struct(client)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			var element helpers.ErrorResponse
+			element.Field = err.StructField()
+			element.Tag = err.Tag()
+			errors = append(errors, &element)
+		}
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": "validation",
+			"record":  errors,
+		})
+	}
+	user := c.Locals("jwt").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	name := claims["name"].(string)
+	temp_decp := helpers.Decryption(name)
+	client_admin, _ := helpers.Parsing_Decry(temp_decp, "==")
+
+	//admin, status, status_dua, phone, username, sData string, idusersales, idcrmsales, idwebagen int
+	result, err := models.Save_crm(
+		client_admin,
+		client.Crm_status, client.Crm_status_dua, client.Crm_phone, client.Crm_username, client.Crm_note,
+		client.Sdata, client.Crm_idusersales, client.Crm_idcrmsales, client.Crm_idwebagen)
+	if err != nil {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+			"record":  nil,
+		})
+	}
+
+	_deleteredis_crm(client.Crm_page, "", "")
+	return c.JSON(result)
+}
+func _deleteredis_crm(page int, admin, status string) {
+	val_master := helpers.DeleteRedis(Fieldcrm_home_redis + "_" + admin + "_" + status + "_" + strconv.Itoa(page))
 	log.Printf("Redis Delete BACKEND CRM : %d", val_master)
-
-	val_crmsales := helpers.DeleteRedis(Fieldcrmsales_home_redis + "_" + phone)
-	log.Printf("Redis Delete BACKEND CRM SALES : %d", val_crmsales)
 }
