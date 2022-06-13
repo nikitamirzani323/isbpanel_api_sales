@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"log"
+	"strconv"
 	"time"
 
 	"bitbucket.org/isbtotogroup/isbpanel_api_sales/entities"
@@ -13,6 +14,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
+const Fieldcrm_master_redis = "LISTCRM_BACKEND_ISBPANEL"
 const Fieldcrm_home_redis = "LISTCRM_SALES_ISBPANEL"
 
 func Crmhome(c *fiber.Ctx) error {
@@ -135,10 +137,10 @@ func CrmSave(c *fiber.Ctx) error {
 	temp_decp := helpers.Decryption(name)
 	client_admin, _ := helpers.Parsing_Decry(temp_decp, "==")
 
-	//admin, status, status_dua, phone, note, sData string, idusersales, idcrmsales, idwebagen, deposit int
+	//admin, status, status_dua, phone, note, iduseragen, sData string, idusersales, idcrmsales, idwebagen, deposit int
 	result, err := models.Save_crm(
 		client_admin,
-		client.Crm_status, client.Crm_status_dua, client.Crm_phone, client.Crm_note,
+		client.Crm_status, client.Crm_status_dua, client.Crm_phone, client.Crm_note, client.Crm_iduseragen,
 		client.Sdata, client.Crm_idusersales, client.Crm_idcrmsales, client.Crm_idwebagen, client.Crm_deposit)
 	if err != nil {
 		c.Status(fiber.StatusBadRequest)
@@ -155,4 +157,14 @@ func CrmSave(c *fiber.Ctx) error {
 func _deleteredis_crm(admin, status string) {
 	val_master := helpers.DeleteRedis(Fieldcrm_home_redis + "_" + admin + "_" + status)
 	log.Printf("Redis Delete BACKEND CRM : %d", val_master)
+
+	for i := 0; i <= 5000; i = i + 250 {
+		val_pusat_1 := helpers.DeleteRedis(Fieldcrm_master_redis + "_PROCESS_" + strconv.Itoa(i) + "_")
+		val_pusat_2 := helpers.DeleteRedis(Fieldcrm_master_redis + "_VALID_" + strconv.Itoa(i) + "_")
+		val_pusat_3 := helpers.DeleteRedis(Fieldcrm_master_redis + "_INVALID_" + strconv.Itoa(i) + "_")
+
+		log.Printf("Redis Delete BACKEND PUSAT PROCESS CRM : %d", val_pusat_1)
+		log.Printf("Redis Delete BACKEND PUSAT VALID CRM : %d", val_pusat_2)
+		log.Printf("Redis Delete BACKEND PUSAT INVALID CRM : %d", val_pusat_3)
+	}
 }

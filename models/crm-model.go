@@ -74,7 +74,7 @@ func Fetch_crm(username, status string) (helpers.Response, error) {
 
 	return res, nil
 }
-func Save_crm(admin, status, status_dua, phone, note, sData string, idusersales, idcrmsales, idwebagen, deposit int) (helpers.Response, error) {
+func Save_crm(admin, status, status_dua, phone, note, iduseragen, sData string, idusersales, idcrmsales, idwebagen, deposit int) (helpers.Response, error) {
 	var res helpers.Response
 	msg := "Failed"
 	tglnow, _ := goment.New()
@@ -132,17 +132,17 @@ func Save_crm(admin, status, status_dua, phone, note, sData string, idusersales,
 					sql_insert := `
 						insert into
 						` + configs.DB_tbl_trx_usersales_deposit + ` (
-							idusersalesdeposit , idcrmsales, idwebagen, phone, username, deposit, 
+							idusersalesdeposit , idcrmsales, idwebagen, phone, username, deposit, iduseragen,  
 							createusersalesdeposit, createdateusersalesdeposit  
 						) values (
-							$1, $2, $3, $4, $5, $6,
-							$7, $8  
+							$1, $2, $3, $4, $5, $6, $7, 
+							$8, $9  
 						)
 					`
 					field_column := configs.DB_tbl_trx_usersales_deposit + tglnow.Format("YYYY")
 					idrecord_counter := Get_counter(field_column)
 					flag_insert, msg_insert := Exec_SQL(sql_insert, configs.DB_tbl_trx_usersales_deposit, "INSERT",
-						tglnow.Format("YY")+strconv.Itoa(idrecord_counter), idcrmsales, idwebagen, phone, admin, deposit,
+						tglnow.Format("YY")+strconv.Itoa(idrecord_counter), idcrmsales, idwebagen, phone, admin, deposit, iduseragen,
 						admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"))
 
 					if flag_insert {

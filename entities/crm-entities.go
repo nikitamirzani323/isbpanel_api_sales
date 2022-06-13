@@ -58,8 +58,10 @@ type Controller_crmsave struct {
 	Crm_status_dua  string `json:"crm_status_dua" `
 	Crm_note        string `json:"crm_note" `
 	Crm_phone       string `json:"crm_phone" `
+	Crm_iduseragen  string `json:"crm_iduseragen" `
 	Crm_deposit     int    `json:"crm_deposit"`
 }
+
 type Controller_crmstatussave struct {
 	Page       string `json:"page" validate:"required"`
 	Crm_page   int    `json:"crm_page"`
