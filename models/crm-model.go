@@ -97,13 +97,13 @@ func Save_crm(admin, status, status_dua, phone, note, iduseragen, sData string, 
 		sql_update_detail := `
 			UPDATE 
 			` + configs.DB_tbl_trx_crmsales + `  
-			SET statuscrmsales_satu=$1, statuscrmsales_dua=$2, notecrmsales=$3, 
-			updatecrmsales=$4, updatedatecrmsales=$5  
-			WHERE idcrmsales=$6  
+			SET statuscrmsales_satu=$1, statuscrmsales_dua=$2, notecrmsales=$3, idwebagen=$4, iduseragen=$5, deposit=$6, 
+			updatecrmsales=$7, updatedatecrmsales=$8  
+			WHERE idcrmsales=$9  
 		`
 
 		flag_update_detail, msg_update_detail := Exec_SQL(sql_update_detail, configs.DB_tbl_trx_crmsales, "UPDATE",
-			status, status_dua, note, admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"), idcrmsales)
+			status, status_dua, note, idwebagen, iduseragen, deposit, admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"), idcrmsales)
 
 		if flag_update_detail {
 			log.Println(msg_update_detail)
@@ -127,31 +127,6 @@ func Save_crm(admin, status, status_dua, phone, note, iduseragen, sData string, 
 			if flag_insert {
 				msg = "Succes"
 				log.Println(msg_insert)
-
-				if status_dua == "DEPOSIT" { // DEPOSIT
-					sql_insert := `
-						insert into
-						` + configs.DB_tbl_trx_usersales_deposit + ` (
-							idusersalesdeposit , idcrmsales, idwebagen, phone, username, deposit, iduseragen,  
-							createusersalesdeposit, createdateusersalesdeposit  
-						) values (
-							$1, $2, $3, $4, $5, $6, $7, 
-							$8, $9  
-						)
-					`
-					field_column := configs.DB_tbl_trx_usersales_deposit + tglnow.Format("YYYY")
-					idrecord_counter := Get_counter(field_column)
-					flag_insert, msg_insert := Exec_SQL(sql_insert, configs.DB_tbl_trx_usersales_deposit, "INSERT",
-						tglnow.Format("YY")+strconv.Itoa(idrecord_counter), idcrmsales, idwebagen, phone, admin, deposit, iduseragen,
-						admin, tglnow.Format("YYYY-MM-DD HH:mm:ss"))
-
-					if flag_insert {
-						msg = "Succes"
-						log.Println(msg_insert)
-					} else {
-						log.Println(msg_insert)
-					}
-				}
 			} else {
 				log.Println(msg_insert)
 			}
