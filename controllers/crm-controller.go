@@ -151,20 +151,24 @@ func CrmSave(c *fiber.Ctx) error {
 		})
 	}
 
-	_deleteredis_crm(client_admin, "PROCESS")
+	_deleteredis_crm(client_admin)
 	return c.JSON(result)
 }
-func _deleteredis_crm(admin, status string) {
-	val_master := helpers.DeleteRedis(Fieldcrm_home_redis + "_" + admin + "_" + status)
-	log.Printf("Redis Delete BACKEND CRM : %d", val_master)
+func _deleteredis_crm(admin string) {
+	val_master := helpers.DeleteRedis(Fieldcrm_home_redis + "_" + admin + "_PROCESS")
+	val_master2 := helpers.DeleteRedis(Fieldcrm_home_redis + "_" + admin + "_FOLLOWUP")
+	log.Printf("Redis Delete BACKEND CRM PROCESS : %d", val_master)
+	log.Printf("Redis Delete BACKEND CRM FOLLOWUP : %d", val_master2)
 
 	for i := 0; i <= 5000; i = i + 250 {
 		val_pusat_1 := helpers.DeleteRedis(Fieldcrm_master_redis + "_PROCESS_" + strconv.Itoa(i) + "_")
 		val_pusat_2 := helpers.DeleteRedis(Fieldcrm_master_redis + "_VALID_" + strconv.Itoa(i) + "_")
 		val_pusat_3 := helpers.DeleteRedis(Fieldcrm_master_redis + "_INVALID_" + strconv.Itoa(i) + "_")
+		val_pusat_4 := helpers.DeleteRedis(Fieldcrm_master_redis + "_FOLLOWUP_" + strconv.Itoa(i) + "_")
 
 		log.Printf("Redis Delete BACKEND PUSAT PROCESS CRM : %d", val_pusat_1)
 		log.Printf("Redis Delete BACKEND PUSAT VALID CRM : %d", val_pusat_2)
 		log.Printf("Redis Delete BACKEND PUSAT INVALID CRM : %d", val_pusat_3)
+		log.Printf("Redis Delete BACKEND PUSAT FOLLOWUP CRM : %d", val_pusat_4)
 	}
 }

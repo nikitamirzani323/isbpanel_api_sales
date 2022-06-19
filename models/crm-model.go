@@ -30,6 +30,7 @@ func Fetch_crm(username, status string) (helpers.Response, error) {
 		FROM ` + configs.DB_tbl_trx_crmsales + `  as A 
 		JOIN ` + configs.DB_tbl_trx_usersales + `  as B ON B.phone = A.phone
 		WHERE A.username=$1 
+		AND A.statuscrmsales_satu !='VALID'    
 		AND B.statususersales=$2 
 		ORDER BY A.createdatecrmsales ASC    
 	`
