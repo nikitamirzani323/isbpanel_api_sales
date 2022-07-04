@@ -8,3 +8,6 @@ type Login struct {
 type Home struct {
 	Page string `json:"page"`
 }
+type Controller_loginpassword struct {
+	Password string `json:"password" validate:"required"`
+}

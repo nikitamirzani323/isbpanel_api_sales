@@ -46,6 +46,7 @@ func Init() *fiber.App {
 	app.Get("/dashboard", monitor.New())
 
 	app.Post("/api/login", controllers.CheckLogin)
+	app.Post("/api/changepassword", middleware.JWTProtected(), controllers.LoginPassword)
 	app.Post("/api/valid", middleware.JWTProtected(), controllers.Home)
 
 	app.Post("/api/websiteagen", middleware.JWTProtected(), controllers.Websiteagenhome)

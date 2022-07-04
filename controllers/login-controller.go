@@ -74,6 +74,53 @@ func CheckLogin(c *fiber.Ctx) error {
 
 	}
 }
+func LoginPassword(c *fiber.Ctx) error {
+	var errors []*helpers.ErrorResponse
+	client := new(entities.Controller_loginpassword)
+	validate := validator.New()
+	if err := c.BodyParser(client); err != nil {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+			"record":  nil,
+		})
+	}
+
+	err := validate.Struct(client)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			var element helpers.ErrorResponse
+			element.Field = err.StructField()
+			element.Tag = err.Tag()
+			errors = append(errors, &element)
+		}
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": "validation",
+			"record":  errors,
+		})
+	}
+	user := c.Locals("jwt").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	name := claims["name"].(string)
+	temp_decp := helpers.Decryption(name)
+	client_admin, _ := helpers.Parsing_Decry(temp_decp, "==")
+
+	result, err := models.UpdatePassword_Model(client_admin, client.Password)
+	if err != nil {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+			"record":  nil,
+		})
+	}
+
+	_deleteredis_login()
+	return c.JSON(result)
+}
 func Home(c *fiber.Ctx) error {
 	client := new(entities.Home)
 	if err := c.BodyParser(client); err != nil {
@@ -99,4 +146,8 @@ func Home(c *fiber.Ctx) error {
 		"message": "ADMIN",
 		"record":  nil,
 	})
+}
+func _deleteredis_login() {
+	val_master := helpers.DeleteRedis("LISTEMPLOYEE_BACKEND_ISBPANEL")
+	log.Printf("Redis Delete BACKEND EMPLOYEE : %d", val_master)
 }

@@ -5,10 +5,12 @@ import (
 	"database/sql"
 	"errors"
 	"log"
+	"time"
 
 	"bitbucket.org/isbtotogroup/isbpanel_api_sales/configs"
 	"bitbucket.org/isbtotogroup/isbpanel_api_sales/db"
 	"bitbucket.org/isbtotogroup/isbpanel_api_sales/helpers"
+	"github.com/gofiber/fiber/v2"
 	"github.com/nleeper/goment"
 )
 
@@ -68,4 +70,34 @@ func Login_Model(username, password, ipaddress string) (bool, string, error) {
 	}
 
 	return true, iddepartement_db, nil
+}
+func UpdatePassword_Model(username, password string) (helpers.Response, error) {
+	var res helpers.Response
+	msg := "Failed"
+	tglnow, _ := goment.New()
+	render_page := time.Now()
+
+	hashpass := helpers.HashPasswordMD5(password)
+	sql_update := `
+		UPDATE ` + configs.DB_tbl_mst_employee + ` 
+		SET password=$1, 
+		updateemployee=$2,  updatedateemployee=$3   
+		WHERE username = $4 
+		AND iddepartement = 'SLS'  
+		AND statusemployee = 'Y' 
+	`
+	flag_update, msg_update := Exec_SQL(sql_update, configs.DB_tbl_mst_employee, "UPDATE",
+		hashpass, username, tglnow.Format("YYYY-MM-DD HH:mm:ss"), username)
+
+	if flag_update {
+		msg = "Succes"
+		log.Println(msg_update)
+	} else {
+		log.Println(msg_update)
+	}
+	res.Status = fiber.StatusOK
+	res.Message = msg
+	res.Record = nil
+	res.Time = time.Since(render_page).String()
+	return res, nil
 }
